@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>행정업무 종합 대시보드</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0b0e18;color:#e2e8f0;font-size:12px;font-family:'Segoe UI',sans-serif;overflow-x:hidden}
+
+/* ── TOPBAR ── */
+.topbar{background:#111827;border-bottom:1px solid #1e2d45;padding:8px 16px;display:flex;align-items:center;position:sticky;top:0;z-index:100}
+.tl{display:flex;align-items:center;gap:10px;flex:1}
+.org{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;border-radius:5px;padding:3px 10px;font-size:11px;font-weight:700;letter-spacing:.5px}
+.tt{color:#f1f5f9;font-size:14px;font-weight:700}
+.ts{color:#475569;font-size:10px}
+.tr2{display:flex;align-items:center;gap:14px;color:#64748b;font-size:11px}
+
+/* ── KPI BAR ── */
+.kbar{display:grid;grid-template-columns:repeat(6,1fr);background:#111827;border-bottom:1px solid #1e2d45}
+.ki{padding:9px 14px;border-right:1px solid #1e2d45;transition:background .2s;cursor:default}
+.ki:last-child{border-right:none}
+.ki:hover{background:#1a2535}
+.kl{color:#64748b;font-size:10px;margin-bottom:3px;text-transform:uppercase;letter-spacing:.4px}
+.kv{font-size:22px;font-weight:800;color:#f1f5f9;line-height:1}
+.kb{display:inline-block;font-size:9px;border-radius:3px;padding:1px 6px;margin-top:3px}
+.up{background:#14532d33;color:#4ade80}.dn{background:#7f1d1d33;color:#f87171}.nt{background:#1e293b;color:#94a3b8}
+
+/* ── MAIN GRID ── */
+.mg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:8px}
+.col{display:flex;flex-direction:column;gap:8px}
+.card{background:#111827;border:1px solid #1e2d45;border-radius:8px;padding:10px 12px;transition:border-color .2s}
+.card:hover{border-color:#2d4a6e}
+.ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.ct{color:#94a3b8;font-size:11px;font-weight:600;display:flex;align-items:center;gap:5px}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dy{background:#eab308}.dbl{background:#3b82f6}.dr{background:#ef4444}.dg{background:#22c55e}.dp{background:#a855f7}.dc{background:#06b6d4}
+
+/* ── BUTTONS ── */
+.bs{background:#1e293b;border:1px solid #2d3f55;border-radius:4px;color:#94a3b8;font-size:10px;padding:2px 8px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.bs:hover{background:#2d3f55;color:#e2e8f0}
+.bsp{background:#2563eb;border:none;border-radius:5px;color:#fff;font-size:11px;padding:5px 11px;cursor:pointer;transition:background .15s}
+.bsp:hover{background:#1d4ed8}
+.bsd{background:#14532d33;border:1px solid #16a34a44;border-radius:4px;color:#4ade80;font-size:10px;padding:2px 8px;cursor:pointer}
+.bsd:hover{background:#14532d55}
+
+/* ── INPUTS ── */
+.inp{background:#0f172a;border:1px solid #2d3f55;border-radius:5px;color:#e2e8f0;font-size:11px;padding:5px 9px;outline:none;width:100%;transition:border-color .15s}
+.inp:focus{border-color:#3b82f6}
+.sel{background:#0f172a;border:1px solid #2d3f55;border-radius:5px;color:#94a3b8;font-size:10px;padding:4px 6px;outline:none}
+.sel:focus{border-color:#3b82f6}
+textarea.inp{resize:vertical;line-height:1.6}
+
+/* ── TAGS & BADGES ── */
+.tag{border-radius:3px;padding:1px 6px;font-size:9px}
+.td1{background:#7f1d1d33;color:#fca5a5;border:1px solid #7f1d1d55}
+.td2{background:#78350f33;color:#fdba74;border:1px solid #78350f55}
+.td5{background:#1e3a5f33;color:#93c5fd;border:1px solid #1e3a5f55}
+.tdone{background:#14532d33;color:#86efac;border:1px solid #14532d55}
+.tbadge{border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600;flex-shrink:0;white-space:nowrap}
+.bac{background:#1e3a5f33;color:#93c5fd}.bpa{background:#78350f33;color:#fdba74}
+.bdo{background:#14532d33;color:#86efac}.bre{background:#7f1d1d33;color:#fca5a5}
+.new-badge{background:linear-gradient(135deg,#7c3aed,#2563eb);color:#fff;font-size:9px;border-radius:3px;padding:1px 6px;font-weight:700}
+
+/* ── ROW / LIST ITEMS ── */
+.row{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:5px;margin-bottom:3px;background:#0f172a;border:1px solid #1e2d45;transition:border-color .15s}
+.row:hover{border-color:#2d4a6e}
+.xb{color:#334155;cursor:pointer;padding:0 2px;font-size:13px;flex-shrink:0;transition:color .15s}
+.xb:hover{color:#f87171}
+
+/* ── PROGRESS ── */
+.pb{background:#1e293b;border-radius:4px;height:6px;overflow:hidden}
+.pf{height:100%;border-radius:4px;transition:width .5s ease}
+
+/* ── GRIDS ── */
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sb{background:#0f172a;border-radius:6px;padding:10px;text-align:center;border:1px solid #1e2d45}
+.ng3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}
+.nb{background:#0f172a;border-radius:6px;padding:8px;text-align:center;border:1px solid #1e2d45}
+.nbi{font-size:18px;font-weight:800;line-height:1;margin-bottom:2px}
+.nbl{color:#475569;font-size:9px;text-transform:uppercase;letter-spacing:.3px}
+
+/* ── AI CHAT ── */
+.chat-area{background:#0b0e18;border-radius:6px;padding:8px;max-height:200px;overflow-y:auto;margin-bottom:6px;display:flex;flex-direction:column;gap:5px;border:1px solid #1e2d45}
+.msg{padding:7px 10px;border-radius:6px;font-size:11px;line-height:1.6;max-width:94%}
+.mu{background:#1e3a5f;color:#bfdbfe;align-self:flex-end;border-radius:6px 6px 2px 6px}
+.ma{background:#1a2535;color:#e2e8f0;align-self:flex-start;border:1px solid #1e2d45;border-radius:6px 6px 6px 2px}
+.mal{color:#60a5fa;font-size:9px;margin-bottom:2px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.ml2{color:#475569;font-size:11px;align-self:flex-start;padding:6px}
+.sp2{display:inline-block;width:10px;height:10px;border:2px solid #1e2d45;border-top-color:#3b82f6;border-radius:50%;animation:spn .7s linear infinite}
+@keyframes spn{to{transform:rotate(360deg)}}
+
+.qtags{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:6px}
+.qt{background:#1e293b;border:1px solid #2d3f55;border-radius:4px;color:#93c5fd;font-size:10px;padding:3px 8px;cursor:pointer;transition:all .15s}
+.qt:hover{background:#1e3a5f;border-color:#3b82f6}
+
+/* ── CALENDAR ── */
+.cal-grid-wrap{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
+.cdn{color:#334155;font-size:9px;padding:3px;text-transform:uppercase;letter-spacing:.3px}
+.cd{color:#94a3b8;font-size:10px;padding:4px 2px;border-radius:4px;cursor:pointer;position:relative;min-height:22px;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.cd:hover{background:#1e293b}
+.cd.today{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;font-weight:700}
+.cd.has-ev{color:#93c5fd}
+.cd.past{color:#1e293b}
+.cd.sel{background:#1e3a5f;border:1px solid #2563eb}
+.cd.empty{pointer-events:none}
+.ev-dot{width:4px;height:4px;border-radius:50%;position:absolute;bottom:2px;left:50%;transform:translateX(-50%)}
+.ev-box{background:#0f172a;border:1px solid #1e3a5f;border-radius:6px;padding:8px 10px;margin-top:6px}
+.ev-title-lbl{color:#93c5fd;font-size:10px;font-weight:600;margin-bottom:4px}
+.ev-item{color:#cbd5e1;font-size:10px;padding:3px 0;display:flex;align-items:center;gap:6px;border-bottom:1px solid #1e293b}
+.ev-item:last-child{border-bottom:none}
+.divider{border:none;border-top:1px solid #1e293b;margin:6px 0}
+
+/* ── MODAL ── */
+.modal-bg{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-bg.open{display:flex}
+.modal{background:#111827;border:1px solid #1e2d45;border-radius:10px;padding:20px;width:640px;max-width:96vw;max-height:88vh;display:flex;flex-direction:column;gap:12px;box-shadow:0 25px 60px rgba(0,0,0,.5)}
+.modal-hd{display:flex;align-items:center;justify-content:space-between}
+.modal-title{color:#f1f5f9;font-size:14px;font-weight:700}
+.modal-close{color:#475569;cursor:pointer;font-size:22px;line-height:1;transition:color .15s}
+.modal-close:hover{color:#f1f5f9}
+.modal-body{overflow-y:auto;flex:1;padding-right:4px}
+.fl-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;margin-bottom:4px;background:#0f172a;border:1px solid #1e2d45;transition:border-color .15s}
+.fl-item:hover{border-color:#2d4a6e}
+.modal-footer{border-top:1px solid #1e2d45;padding-top:12px}
+.mf-title{color:#64748b;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.mf-row{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.filter-row{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px}
+.fb{background:#1e293b;border:1px solid #2d3f55;border-radius:4px;color:#94a3b8;font-size:10px;padding:3px 9px;cursor:pointer;transition:all .15s}
+.fb:hover,.fb.on{background:#1e3a5f;border-color:#2563eb;color:#60a5fa}
+.range-inp{accent-color:#3b82f6;cursor:pointer}
+
+/* ── SPINNER ── */
+@keyframes sp3{to{transform:rotate(360deg)}}
+.rspin{animation:sp3 .7s linear infinite;display:inline-block}
+.ri{cursor:pointer;display:inline-block}
+
+/* ══════════════════════════════════════
+   NEW FEATURES
+══════════════════════════════════════ */
+
+/* ── 포모도로 ── */
+.pomo-wrap{text-align:center;padding:6px 0}
+.pomo-time{font-size:32px;font-weight:800;color:#f1f5f9;font-variant-numeric:tabular-nums;letter-spacing:2px}
+.pomo-lbl{font-size:10px;color:#64748b;margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
+.pomo-prog{height:4px;background:#1e293b;border-radius:2px;margin:8px 0;overflow:hidden}
+.pomo-bar{height:100%;border-radius:2px;transition:width .5s,background .3s}
+.pomo-btns{display:flex;gap:6px;justify-content:center;margin-top:4px}
+.pomo-dots{display:flex;gap:4px;justify-content:center;margin-top:6px}
+.pdot{width:10px;height:10px;border-radius:50%;background:#1e293b;transition:background .3s}
+.pdot.done{background:#ef4444}
+.pomo-stat{text-align:center;font-size:10px;color:#475569;margin-top:4px}
+
+/* ── 업무 타이머 ── */
+.timer-item{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:5px;margin-bottom:3px;background:#0f172a;border:1px solid #1e2d45}
+.tdisplay{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;min-width:56px}
+.trun{color:#4ade80;animation:pulse 1s infinite}
+.tpause{color:#fbbf24}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+.tbtn{width:24px;height:24px;border-radius:4px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;transition:opacity .15s}
+.tbtn:hover{opacity:.8}
+.tbtn-g{background:#14532d33;color:#4ade80}.tbtn-y{background:#78350f33;color:#fbbf24}.tbtn-r{background:#7f1d1d33;color:#f87171}
+
+/* ── 컨디션 체크 ── */
+.mood-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-bottom:6px}
+.mood-btn{background:#0f172a;border:1px solid #1e2d45;border-radius:6px;padding:6px 3px;cursor:pointer;text-align:center;transition:all .2s}
+.mood-btn:hover,.mood-btn.sel{border-color:#2563eb;background:#1e3a5f33;transform:scale(1.05)}
+.mood-emoji{font-size:18px;display:block;margin-bottom:2px}
+.mood-lbl{font-size:9px;color:#475569}
+.mood-hist{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.mood-dot{width:11px;height:11px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .15s}
+.mood-dot:hover{transform:scale(1.3)}
+.mood-advice{background:#0f172a;border-radius:5px;padding:6px 8px;margin-top:5px;font-size:10px;color:#94a3b8;line-height:1.5;border:1px solid #1e2d45}
+
+/* ── 히트맵 ── */
+.hm-labels{display:grid;grid-template-columns:repeat(13,1fr);gap:3px;margin-bottom:3px}
+.hm-lbl{font-size:8px;color:#334155;text-align:center}
+.hm-grid{display:grid;grid-template-columns:repeat(13,1fr);gap:3px}
+.hm-cell{height:14px;border-radius:3px;cursor:pointer;transition:transform .1s,filter .1s}
+.hm-cell:hover{transform:scale(1.4);filter:brightness(1.4);z-index:10;position:relative}
+
+/* ── 도넛 ── */
+.donut-wrap{display:flex;align-items:center;gap:14px}
+.donut-legend{display:flex;flex-direction:column;gap:5px;flex:1}
+.dl-row{display:flex;align-items:center;gap:6px;font-size:10px}
+.dl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* ── 결재 경로 ── */
+.ap-path{display:flex;align-items:flex-start;overflow-x:auto;padding:6px 0;gap:0;scrollbar-width:none}
+.ap-path::-webkit-scrollbar{display:none}
+.ap-step{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0}
+.ap-node{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;border:2px solid transparent;transition:all .2s}
+.ap-done{background:#14532d33;border-color:#22c55e;color:#4ade80}
+.ap-cur{background:#1e3a5f33;border-color:#3b82f6;color:#60a5fa;animation:apblink 1.5s infinite}
+@keyframes apblink{0%,100%{border-color:#3b82f6;box-shadow:0 0 0 0 #3b82f622}50%{border-color:#93c5fd;box-shadow:0 0 0 4px #3b82f622}}
+.ap-wait{background:#0f172a;border-color:#1e293b;color:#334155}
+.ap-rej{background:#7f1d1d33;border-color:#ef4444;color:#f87171}
+.ap-name{font-size:9px;color:#475569;text-align:center;max-width:38px;word-break:keep-all;line-height:1.3}
+.ap-arr{color:#1e293b;font-size:16px;padding:0 2px;margin-top:8px;flex-shrink:0}
+
+/* ── 문서 생성기 ── */
+.doc-tmpl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:6px}
+.doc-tmpl{background:#0f172a;border:1px solid #1e2d45;border-radius:6px;padding:8px;cursor:pointer;text-align:center;transition:all .2s}
+.doc-tmpl:hover{border-color:#2563eb;background:#1e3a5f22;transform:translateY(-1px)}
+.doc-icon{font-size:16px;margin-bottom:3px}
+.doc-name{font-size:10px;color:#94a3b8}
+.doc-prev{background:#0b0e18;border:1px solid #1e2d45;border-radius:5px;padding:8px;font-size:10px;color:#94a3b8;line-height:1.8;display:none;max-height:130px;overflow-y:auto;white-space:pre-wrap;font-family:monospace}
+.doc-prev.show{display:block}
+
+/* ── 공지 티커 ── */
+.ticker-wrap{overflow:hidden;background:#0f172a;border-radius:5px;padding:5px 8px;border:1px solid #1e2d45}
+.ticker-inner{display:flex;gap:50px;animation:ticker 20s linear infinite;white-space:nowrap}
+.ticker-inner:hover{animation-play-state:paused}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.ticker-item{color:#64748b;font-size:10px;display:flex;align-items:center;gap:5px;flex-shrink:0}
+
+/* ── 날씨 ── */
+.wx-row{display:flex;gap:4px}
+.wx-item{background:#0f172a;border:1px solid #1e2d45;border-radius:5px;padding:5px 4px;text-align:center;flex:1}
+.wx-icon{font-size:14px}
+.wx-day{color:#475569;font-size:9px;margin-top:1px}
+.wx-temp{color:#e2e8f0;font-size:10px;font-weight:600}
+
+/* ── 메모 ── */
+.memo-toolbar{display:flex;gap:4px;margin-bottom:4px;align-items:center}
+.memo-saved{color:#4ade80;font-size:10px;opacity:0;transition:opacity .3s}
+.memo-saved.show{opacity:1}
+
+/* ── 브리핑 카드 ── */
+.brief-card{background:#0f172a;border-radius:6px;padding:8px 10px;margin-bottom:5px;border-left:3px solid;transition:border-color .2s}
+
+/* ── 새 섹션 ── */
+.new-section{background:#0d1520;border-top:2px solid #1e3a5f;padding:8px}
+.ns-title{color:#60a5fa;font-size:11px;font-weight:700;display:flex;align-items:center;gap:7px;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.ns-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+</style>
+</head>
+<body>
+
+<!-- ══ TOPBAR ══ -->
+<div class="topbar">
+  <div class="tl">
+    <span class="org">행정</span>
+    <span class="tt">행정업무 종합 대시보드</span>
+    <span class="ts">경영지원본부 총무팀 · EMP-2021-0843</span>
+  </div>
+  <div class="tr2">
+    <span id="today-lbl">📅</span>
+    <span>☀️ 서울 28°C</span>
+    <span style="color:#f1f5f9;font-weight:700;font-size:12px" id="clock">--:--:--</span>
+  </div>
+</div>
+
+<!-- ══ KPI BAR ══ -->
+<div class="kbar">
+  <div class="ki"><div class="kl">진행 업무</div><div class="kv" id="kpi-a">0</div><span class="kb nt">건</span></div>
+  <div class="ki"><div class="kl">결재 대기</div><div class="kv" style="color:#fbbf24" id="kpi-w">0</div><span class="kb dn">건</span></div>
+  <div class="ki"><div class="kl">D-1 임박</div><div class="kv" style="color:#f87171" id="kpi-u">0</div><span class="kb dn">마감임박</span></div>
+  <div class="ki"><div class="kl">금주 완료</div><div class="kv" style="color:#4ade80" id="kpi-d">0</div><span class="kb up">건</span></div>
+  <div class="ki"><div class="kl">연차 잔여</div><div class="kv">11일</div><span class="kb nt">/ 25일</span></div>
+  <div class="ki"><div class="kl">미읽은 알림</div><div class="kv" style="color:#a78bfa" id="kpi-al">0</div><span class="kb nt">건</span></div>
+</div>
+
+<!-- ══ MAIN GRID ══ -->
+<div class="mg">
+
+<!-- ═ COL 1 ═ -->
+<div class="col">
+
+  <div class="card">
+    <div class="ch"><span class="ct"><span class="dot dy"></span>AI 데일리 브리핑</span><span style="color:#334155;font-size:10px">09:00 업데이트</span></div>
+    <div class="brief-card" style="border-color:#ef4444">
+      <div style="color:#fca5a5;font-size:10px;margin-bottom:2px">🔴 우선순위 1위</div>
+      <div style="color:#e2e8f0;font-size:11px">Q2 경영실적 보고서 최종본 결재 상신</div>
+      <div style="color:#475569;font-size:10px;margin-top:2px">D-1 · 본부장 결재 요청</div>
+    </div>
+    <div class="brief-card" style="border-color:#f97316">
+      <div style="color:#fdba74;font-size:10px;margin-bottom:2px">🟠 우선순위 2위</div>
+      <div style="color:#e2e8f0;font-size:11px">5/15 임원회의실 예약 및 자료 배포</div>
+      <div style="color:#475569;font-size:10px;margin-top:2px">D-2 · A회의실 예약 필요</div>
+    </div>
+    <div class="brief-card" style="border-color:#eab308">
+      <div style="color:#fcd34d;font-size:10px;margin-bottom:2px">🟡 우선순위 3위</div>
+      <div style="color:#e2e8f0;font-size:11px">사무용품 계정 점검 및 발주</div>
+      <div style="color:#475569;font-size:10px;margin-top:2px">D-5 · 구매팀 협의 필요</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch">
+      <span class="ct"><span class="dot dbl"></span>To-Do List <span style="color:#3b82f6;font-size:10px" id="todo-cnt"></span></span>
+      <div style="display:flex;gap:3px">
+        <button class="fb on" id="f-all" onclick="filterTodo('all')">전체</button>
+        <button class="fb" id="f-ac" onclick="filterTodo('active')">미완료</button>
+        <button class="fb" id="f-dn" onclick="filterTodo('done')">완료</button>
+        <button class="bs" style="color:#60a5fa" onclick="openModal('m-todo')">전체보기</button>
+      </div>
+    </div>
+    <div id="todo-list"></div>
+    <div style="display:flex;gap:4px;margin-top:5px">
+      <input class="inp" id="todo-inp" placeholder="새 업무 입력 후 Enter..." style="flex:1" onkeydown="if(event.key==='Enter')addTodo()"/>
+      <select class="sel" id="todo-pri"><option value="d1">D-1</option><option value="d2">D-2</option><option value="d5" selected>D-5</option></select>
+      <button class="bsp" onclick="addTodo()">추가</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><span class="ct"><span class="dot dbl"></span>프로젝트 마일스톤</span><button class="bs" style="color:#60a5fa" onclick="openModal('m-ms')">전체보기</button></div>
+    <div id="ms-list"></div>
+  </div>
+
+  <!-- 🍅 포모도로 -->
+  <div class="card">
+    <div class="ch"><span class="ct"><span class="dot dr"></span>🍅 포모도로 집중 타이머<span class="new-badge">NEW</span></span></div>
+    <div class="pomo-wrap">
+      <div class="pomo-time" id="pomo-time">25:00</div>
+      <div class="pomo-lbl" id="pomo-lbl">집중 시간</div>
+      <div class="pomo-prog"><div class="pomo-bar" id="pomo-bar" style="width:100%;background:#ef4444"></div></div>
+    </div>
+    <div class="pomo-btns">
+      <button class="bsp" id="pomo-btn" onclick="pomoToggle()">▶ 시작</button>
+      <button class="bs" onclick="pomoReset()">↺ 리셋</button>
+      <button class="bs" onclick="pomoSkip()">건너뛰기 ▷</button>
+    </div>
+    <div class="pomo-dots" id="pomo-dots"></div>
+    <div class="pomo-stat" id="pomo-stat">오늘 완료: 0 포모도로</div>
+  </div>
+
+</div>
+
+<!-- ═ COL 2 ═ -->
+<div class="col">
+
+  <div class="card">
+    <div class="ch"><span class="ct"><span class="dot dg"></span>실시간 환율</span><button class="bs" id="rate-btn" onclick="refreshRates()"><span class="ri" id="rate-ic">↻</span> 새로고침</button></div>
+    <div class="sg" id="rate-grid"></div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><span class="ct"><span class="dot dbl"></span>결재 · 문서 트래커</span><button class="bs" style="color:#60a5fa" onclick="openModal('m-tracker')">전체보기</button></div>
+    <div class="ng3">
+      <div class="nb"><div class="nbi" style="color:#94a3b8" id="tr-d">0</div><div class="nbl">기안중</div></div>
+      <div class="nb"><div class="nbi" style="color:#fbbf24" id="tr-w">0</div><div class="nbl">검토중</div></div>
+      <div class="nb"><div class="nbi" style="color:#f87171" id="tr-r">0</div><div class="nbl">반려</div></div>
+    </div>
+    <div id="tracker-list"></div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><span class="ct"><span class="dot dr"></span>알림 센터</span>
+      <div style="display:flex;gap:3px">
+        <button class="bs" onclick="clearAlerts()">모두읽음</button>
+        <button class="bs" style="color:#60a5fa" onclick="openModal('m-alert')">전체보기</button>
+      </div>
+    </div>
+    <div id="alert-list"></div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><span class="ct"><span class="dot dr"></span>외부 응대 현황</span><button class="bs" style="color:#60a5fa" onclick="openModal('m-ext')">전체보기</button></div>
+    <div class="ng3">
+      <div class="nb"><div class="nbi" style="color:#4ade80">4</div><div class="nbl">전화</div></div>
+      <div class="nb"><div class="nbi" style="color:#60a5fa">2</div><div class="nbl">방문</div></div>
+      <div class="nb"><div class="nbi" style="color:#c084fc">1</div><div class="nbl">화상</div></div>
+    </div>
+    <div id="ext-list"></div>
+  </div>
+
+  <!-- 📍 결재 경로 -->
+  <div class="card">
+    <div class="ch"><span class="ct"><span class="dot dbl"></span>📍 결재 경로 추적기<span class="new-badge">NEW</span></span>
+      <select class="sel" id="ap-sel" onchange="renderApproval()">
+        <option value="0">법인카드 정산 신청서</option>
+        <option value="1">Q2 실적보고서 V3</option>
+        <option value="2">외부 강사료 지급품의</option>
+        <option value="3">사무용품 구매 품의</option>
+      </select>
+    </div>
+    <div class="ap-path" id="ap-path"></div>
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:5px;font-size:9px;color:#334155">
+      <span><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#22c55e;margin-right:3px"></span>완료</span>
+      <span><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#3b82f6;margin-right:3px"></span>진행중</span>
+      <span><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#334155;margin-right:3px"></span>대기</span>
+      <span><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#ef4444;margin-right:3px"></span>반려</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═ COL 3 ═ -->
+<div class="col">
+
+  <div class="card">
+    <div class="ch"><span class="ct"><span style="background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;border-radius:4px;padding:1px 7px;font-size:10px;font-weight:700">AI 비서</span> Claude</span><span style="color:#4ade80;font-size:10px">● 온라인</span></div>
+    <div class="qtags">
+      <span class="qt" onclick="quickAsk('오늘 주요 업무 브리핑해줘')">오늘 브리핑</span>
+      <span class="qt" onclick="quickAsk('미결 결재 현황 알려줘')">미결 결재</span>
+      <span class="qt" onclick="quickAsk('이번 주 일정 알려줘')">이번 주 일정</span>
+      <span class="qt" onclick="quickAsk('연차 현황 알려줘')">연차 현황</span>
+      <span class="qt" onclick="quickAsk('회의실 현황 알려줘')">회의실 현황</span>
+      <span class="qt" onclick="quickAsk('법인카드 안내해줘')">법인카드</span>
+    </div>
+    <div class="chat-area" id="chat-area">
+      <div class="msg ma"><div class="mal">AI 비서</div>안녕하세요! D-1 마감 업무를 먼저 확인해보세요. 빠른 버튼이나 직접 질문해주세요.</div>
+    </div>
+    <div style="display:flex;gap:5px">
+      <input class="inp" id="ai-inp" placeholder="AI 비서에게 질문하세요..." style="flex:1" onkeydown="if(event.key==='Enter')sendAI()"/>
+      <button class="bsp" onclick="sendAI()">전송</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><span class="ct"><span class="dot dbl"></span><span id="cal-title">2026년 5월</span></span>
+      <div style="display:flex;gap:3px">
+        <button class="bs" onclick="changeMonth(-1)">◀ 이전</button>
+        <button class="bs" onclick="changeMonth(1)">다음 ▶</button>
+      </div>
+    </div>
+    <div id="cal-grid"></div>
+    <div id="cal-ev-box" class="ev-box" style="display:none">
+      <div class="ev-title-lbl" id="ev-date-lbl"></div>
+      <div id="ev-items"></div>
+    </div>
+    <div class="divider"></div>
+    <div style="color:#334155;font-size:10px;margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px">이달 주요 일정</div>
+    <div id="upcoming"></div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><span class="ct"><span class="dot dy"></span>연차 현황</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:10px;color:#475569;margin-bottom:3px"><span>사용 14일</span><span>잔여 11일</span></div>
+    <div class="pb" style="height:8px;margin-bottom:8px"><div class="pf" style="width:56%;background:linear-gradient(90deg,#2563eb,#3b82f6);height:8px"></div></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+      <div class="nb"><div class="nbi" style="color:#4ade80">14</div><div class="nbl">사용</div></div>
+      <div class="nb"><div class="nbi" style="color:#fbbf24">11</div><div class="nbl">잔여</div></div>
+      <div class="nb"><div class="nbi" style="color:#f1f5f9">25</div><div class="nbl">총연차</div></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ══ NEW SECTION ══ -->
+<div class="new-section">
+  <div class="ns-title">✨ 스마트 확장 기능 <span class="new-badge">추가 기능</span></div>
+  <div class="ns-grid">
+
+    <!-- 업무 열기도 히트맵 -->
+    <div class="card">
+      <div class="ch"><span class="ct"><span class="dot dg"></span>📈 업무 열기도 히트맵<span class="new-badge">NEW</span></span><span style="color:#334155;font-size:10px">최근 13주</span></div>
+      <div class="hm-labels" id="hm-labels"></div>
+      <div class="hm-grid" id="heatmap"></div>
+      <div style="display:flex;align-items:center;gap:4px;margin-top:5px;font-size:9px;color:#334155">
+        <span>적음</span>
+        <div style="width:10px;height:10px;border-radius:2px;background:#14532d22"></div>
+        <div style="width:10px;height:10px;border-radius:2px;background:#16a34a44"></div>
+        <div style="width:10px;height:10px;border-radius:2px;background:#16a34a88"></div>
+        <div style="width:10px;height:10px;border-radius:2px;background:#22c55e"></div>
+        <span>많음</span>
+        <span id="hm-tip" style="margin-left:auto;color:#60a5fa;font-size:10px"></span>
+      </div>
+    </div>
+
+    <!-- 컨디션 체크 -->
+    <div class="card">
+      <div class="ch"><span class="ct"><span class="dot dp"></span>😊 오늘의 컨디션 체크<span class="new-badge">NEW</span></span><span style="color:#334155;font-size:10px" id="mood-saved-lbl"></span></div>
+      <div class="mood-grid" id="mood-grid">
+        <div class="mood-btn" onclick="selectMood(0,'😫','힘듦')"><span class="mood-emoji">😫</span><span class="mood-lbl">힘듦</span></div>
+        <div class="mood-btn" onclick="selectMood(1,'😔','우울')"><span class="mood-emoji">😔</span><span class="mood-lbl">우울</span></div>
+        <div class="mood-btn" onclick="selectMood(2,'😐','보통')"><span class="mood-emoji">😐</span><span class="mood-lbl">보통</span></div>
+        <div class="mood-btn" onclick="selectMood(3,'😊','좋음')"><span class="mood-emoji">😊</span><span class="mood-lbl">좋음</span></div>
+        <div class="mood-btn" onclick="selectMood(4,'🔥','최고')"><span class="mood-emoji">🔥</span><span class="mood-lbl">최고</span></div>
+      </div>
+      <div style="color:#334155;font-size:10px;margin-bottom:3px">최근 7일 기록</div>
+      <div class="mood-hist" id="mood-hist"></div>
+      <div class="mood-advice" id="mood-advice">오늘의 컨디션을 선택해주세요.</div>
+    </div>
+
+    <!-- 부서 예산 도넛 -->
+    <div class="card">
+      <div class="ch"><span class="ct"><span class="dot dy"></span>💰 부서 예산 현황<span class="new-badge">NEW</span></span><span style="color:#334155;font-size:10px">2026년 5월</span></div>
+      <div class="donut-wrap">
+        <svg width="96" height="96" viewBox="0 0 96 96" style="flex-shrink:0">
+          <circle cx="48" cy="48" r="36" fill="none" stroke="#1e293b" stroke-width="13"/>
+          <circle id="dc1" cx="48" cy="48" r="36" fill="none" stroke="#3b82f6" stroke-width="13" stroke-dasharray="0 226" stroke-linecap="round" transform="rotate(-90 48 48)" style="transition:stroke-dasharray .8s ease"/>
+          <circle id="dc2" cx="48" cy="48" r="36" fill="none" stroke="#22c55e" stroke-width="13" stroke-dasharray="0 226" stroke-linecap="round" transform="rotate(-90 48 48)" style="transition:stroke-dasharray .8s ease .1s"/>
+          <circle id="dc3" cx="48" cy="48" r="36" fill="none" stroke="#fbbf24" stroke-width="13" stroke-dasharray="0 226" stroke-linecap="round" transform="rotate(-90 48 48)" style="transition:stroke-dasharray .8s ease .2s"/>
+          <text x="48" y="44" text-anchor="middle" fill="#f1f5f9" font-size="13" font-weight="800">68%</text>
+          <text x="48" y="56" text-anchor="middle" fill="#475569" font-size="8">사용률</text>
+        </svg>
+        <div class="donut-legend">
+          <div class="dl-row"><span class="dl-dot" style="background:#3b82f6"></span><span style="color:#94a3b8;flex:1">소모품</span><span style="color:#93c5fd">₩2.1M</span></div>
+          <div class="dl-row"><span class="dl-dot" style="background:#22c55e"></span><span style="color:#94a3b8;flex:1">교육비</span><span style="color:#4ade80">₩0.8M</span></div>
+          <div class="dl-row"><span class="dl-dot" style="background:#fbbf24"></span><span style="color:#94a3b8;flex:1">회식비</span><span style="color:#fbbf24">₩0.4M</span></div>
+          <div class="dl-row"><span class="dl-dot" style="background:#1e293b"></span><span style="color:#94a3b8;flex:1">잔여</span><span style="color:#334155">₩1.5M</span></div>
+          <div style="border-top:1px solid #1e293b;margin-top:4px;padding-top:4px;font-size:10px;color:#334155">총 ₩4.8M / 사용 ₩3.3M</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 업무 시간 추적기 -->
+    <div class="card">
+      <div class="ch"><span class="ct"><span class="dot dg"></span>⏱️ 업무 시간 추적기<span class="new-badge">NEW</span></span><span style="color:#4ade80;font-size:10px" id="total-time">오늘 총 0h 0m</span></div>
+      <div id="timer-list"></div>
+      <div style="display:flex;gap:4px;margin-top:5px">
+        <input class="inp" id="timer-inp" placeholder="업무명 입력 후 Enter..." style="flex:1" onkeydown="if(event.key==='Enter')addTimer()"/>
+        <button class="bsp" onclick="addTimer()">추가</button>
+      </div>
+    </div>
+
+    <!-- 빠른 문서 생성기 -->
+    <div class="card">
+      <div class="ch"><span class="ct"><span class="dot dbl"></span>📝 빠른 문서 초안 생성기<span class="new-badge">NEW</span></span></div>
+      <div class="doc-tmpl-grid">
+        <div class="doc-tmpl" onclick="loadTemplate('품의서')"><div class="doc-icon">📋</div><div class="doc-name">품의서</div></div>
+        <div class="doc-tmpl" onclick="loadTemplate('회의록')"><div class="doc-icon">📝</div><div class="doc-name">회의록</div></div>
+        <div class="doc-tmpl" onclick="loadTemplate('보고서')"><div class="doc-icon">📊</div><div class="doc-name">보고서</div></div>
+        <div class="doc-tmpl" onclick="loadTemplate('출장신청')"><div class="doc-icon">✈️</div><div class="doc-name">출장신청</div></div>
+        <div class="doc-tmpl" onclick="loadTemplate('업무협조')"><div class="doc-icon">🤝</div><div class="doc-name">업무협조</div></div>
+        <div class="doc-tmpl" onclick="loadTemplate('연차신청')"><div class="doc-icon">🏖️</div><div class="doc-name">연차신청</div></div>
+      </div>
+      <div class="doc-prev" id="doc-prev"></div>
+      <div id="doc-action-btns" style="display:none;display:flex;gap:4px;margin-top:4px">
+        <button class="bsd" id="doc-copy-btn" onclick="copyDoc()">📋 복사</button>
+        <button class="bs" onclick="clearDoc()">초기화</button>
+      </div>
+    </div>
+
+    <!-- 공지 + 날씨 + 메모 -->
+    <div class="card">
+      <div class="ch"><span class="ct"><span class="dot dy"></span>📢 공지사항 · ☁️ 날씨 · 📌 메모</span></div>
+      <div style="color:#334155;font-size:10px;margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">공지사항</div>
+      <div class="ticker-wrap" style="margin-bottom:7px">
+        <div class="ticker-inner">
+          <span class="ticker-item"><span style="color:#ef4444">●</span> [긴급] 5/15 임원보고 자료 오전 9시까지 제출</span>
+          <span class="ticker-item"><span style="color:#fbbf24">●</span> [안내] 6월 정기 시설 점검 5/20~21 예정</span>
+          <span class="ticker-item"><span style="color:#3b82f6">●</span> [공지] 상반기 인사평가 6/1~15 시행</span>
+          <span class="ticker-item"><span style="color:#22c55e">●</span> [행사] 창립기념일 6/3 (수) 오후 3시</span>
+          <span class="ticker-item"><span style="color:#a855f7">●</span> [복지] 여름 휴가비 6/25 지급 예정</span>
+          <span class="ticker-item"><span style="color:#ef4444">●</span> [긴급] 5/15 임원보고 자료 오전 9시까지 제출</span>
+          <span class="ticker-item"><span style="color:#fbbf24">●</span> [안내] 6월 정기 시설 점검 5/20~21 예정</span>
+          <span class="ticker-item"><span style="color:#3b82f6">●</span> [공지] 상반기 인사평가 6/1~15 시행</span>
+          <span class="ticker-item"><span style="color:#22c55e">●</span> [행사] 창립기념일 6/3 (수) 오후 3시</span>
+          <span class="ticker-item"><span style="color:#a855f7">●</span> [복지] 여름 휴가비 6/25 지급 예정</span>
+        </div>
+      </div>
+      <div style="color:#334155;font-size:10px;margin-bottom:4px;text-transform:uppercase;letter-spacing:.3px">서울 주간 날씨</div>
+      <div class="wx-row" style="margin-bottom:7px">
+        <div class="wx-item"><div class="wx-icon">☀️</div><div class="wx-day">화(오늘)</div><div class="wx-temp">28°/18°</div></div>
+        <div class="wx-item"><div class="wx-icon">⛅</div><div class="wx-day">수</div><div class="wx-temp">25°/17°</div></div>
+        <div class="wx-item"><div class="wx-icon">🌧️</div><div class="wx-day">목</div><div class="wx-temp">21°/15°</div></div>
+        <div class="wx-item"><div class="wx-icon">🌧️</div><div class="wx-day">금</div><div class="wx-temp">19°/14°</div></div>
+        <div class="wx-item"><div class="wx-icon">⛅</div><div class="wx-day">토</div><div class="wx-temp">23°/15°</div></div>
+        <div class="wx-item"><div class="wx-icon">☀️</div><div class="wx-day">일</div><div class="wx-temp">27°/16°</div></div>
+      </div>
+      <div style="color:#334155;font-size:10px;margin-bottom:4px;text-transform:uppercase;letter-spacing:.3px">빠른 메모</div>
+      <div class="memo-toolbar">
+        <button class="bs" onclick="saveMemo()">💾 저장</button>
+        <button class="bs" onclick="clearMemo()">🗑️ 지우기</button>
+        <span class="memo-saved" id="memo-saved">✓ 저장됨</span>
+      </div>
+      <textarea class="inp" id="memo-area" rows="3" placeholder="빠른 메모를 입력하세요..."></textarea>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ MODALS ══ -->
+<div class="modal-bg" id="m-todo" onclick="if(event.target===this)closeModal('m-todo')">
+<div class="modal">
+  <div class="modal-hd"><span class="modal-title">📋 To-Do 전체 목록</span><span class="modal-close" onclick="closeModal('m-todo')">✕</span></div>
+  <div class="filter-row">
+    <button class="fb on" id="mf-all" onclick="setMTF('all')">전체</button>
+    <button class="fb" id="mf-ac" onclick="setMTF('active')">미완료</button>
+    <button class="fb" id="mf-dn" onclick="setMTF('done')">완료</button>
+  </div>
+  <div class="modal-body" id="m-todo-list"></div>
+  <div class="modal-footer">
+    <div class="mf-title">새 업무 추가</div>
+    <div class="mf-row">
+      <input class="inp" id="m-todo-inp" placeholder="업무명..." style="flex:1" onkeydown="if(event.key==='Enter')addTodoM()"/>
+      <select class="sel" id="m-todo-pri"><option value="d1">D-1</option><option value="d2">D-2</option><option value="d5" selected>D-5</option></select>
+      <button class="bsp" onclick="addTodoM()">추가</button>
+    </div>
+  </div>
+</div></div>
+
+<div class="modal-bg" id="m-tracker" onclick="if(event.target===this)closeModal('m-tracker')">
+<div class="modal">
+  <div class="modal-hd"><span class="modal-title">📄 결재 · 문서 트래커 전체</span><span class="modal-close" onclick="closeModal('m-tracker')">✕</span></div>
+  <div class="filter-row">
+    <button class="fb on" id="tf-all" onclick="setTRF('all')">전체</button>
+    <button class="fb" id="tf-bac" onclick="setTRF('bac')">기안중</button>
+    <button class="fb" id="tf-bpa" onclick="setTRF('bpa')">검토중</button>
+    <button class="fb" id="tf-bdo" onclick="setTRF('bdo')">완결</button>
+    <button class="fb" id="tf-bre" onclick="setTRF('bre')">반려</button>
+  </div>
+  <div class="modal-body" id="m-tracker-list"></div>
+  <div class="modal-footer">
+    <div class="mf-title">새 문서 등록</div>
+    <div class="mf-row">
+      <input class="inp" id="tr-inp" placeholder="문서명..." style="flex:1" onkeydown="if(event.key==='Enter')addTracker()"/>
+      <select class="sel" id="tr-st"><option value="bac">기안중</option><option value="bpa">검토중</option><option value="bdo">완결</option><option value="bre">반려</option></select>
+      <input class="inp" id="tr-who" placeholder="담당자" style="width:75px"/>
+      <button class="bsp" onclick="addTracker()">등록</button>
+    </div>
+  </div>
+</div></div>
+
+<div class="modal-bg" id="m-ms" onclick="if(event.target===this)closeModal('m-ms')">
+<div class="modal">
+  <div class="modal-hd"><span class="modal-title">📊 프로젝트 마일스톤 전체</span><span class="modal-close" onclick="closeModal('m-ms')">✕</span></div>
+  <div class="modal-body" id="m-ms-list"></div>
+  <div class="modal-footer">
+    <div class="mf-title">새 마일스톤 추가</div>
+    <div class="mf-row">
+      <input class="inp" id="ms-inp" placeholder="프로젝트명..." style="flex:1" onkeydown="if(event.key==='Enter')addMs()"/>
+      <input type="number" class="inp" id="ms-pct" placeholder="%" min="0" max="100" style="width:60px"/>
+      <button class="bsp" onclick="addMs()">추가</button>
+    </div>
+  </div>
+</div></div>
+
+<div class="modal-bg" id="m-alert" onclick="if(event.target===this)closeModal('m-alert')">
+<div class="modal">
+  <div class="modal-hd"><span class="modal-title">🔔 알림 전체</span><span class="modal-close" onclick="closeModal('m-alert')">✕</span></div>
+  <div class="modal-body" id="m-alert-list"></div>
+  <div class="modal-footer"><button class="bs" style="width:100%" onclick="clearAlerts();renderMAlert()">모두 읽음 처리</button></div>
+</div></div>
+
+<div class="modal-bg" id="m-ext" onclick="if(event.target===this)closeModal('m-ext')">
+<div class="modal">
+  <div class="modal-hd"><span class="modal-title">📞 외부 응대 전체</span><span class="modal-close" onclick="closeModal('m-ext')">✕</span></div>
+  <div class="modal-body" id="m-ext-list"></div>
+  <div class="modal-footer">
+    <div class="mf-title">새 응대 등록</div>
+    <div class="mf-row">
+      <select class="sel" id="ext-type"><option>전화</option><option>방문</option><option>화상</option></select>
+      <input class="inp" id="ext-inp" placeholder="내용..." style="flex:1" onkeydown="if(event.key==='Enter')addExt()"/>
+      <input class="inp" id="ext-time" placeholder="시간" style="width:72px"/>
+      <button class="bsp" onclick="addExt()">등록</button>
+    </div>
+  </div>
+</div></div>
+
+<script>
+const S={
+  todos:[
+    {id:1,text:'Q2 경영실적 보고서 최종본 결재 상신',done:true,pri:'d1'},
+    {id:2,text:'5/15 임원회의실 예약 및 자료 공유',done:false,pri:'d2'},
+    {id:3,text:'도기에서 견적서 전달 (본부장님)',done:false,pri:'d5'},
+    {id:4,text:'사무용품 계정 점검 및 발주',done:false,pri:'d2'},
+    {id:5,text:'4월 법인카드 사용내역 정산 보고',done:false,pri:'d1'},
+  ],
+  nid:6, tf:'all', mtf:'all',
+  trackers:[
+    {id:1,s:'bac',title:'법인카드 정산 신청서',who:'본부장'},
+    {id:2,s:'bac',title:'Q2 실적보고서 V3',who:'임원'},
+    {id:3,s:'bpa',title:'외부 강사료 지급품의',who:'부장'},
+    {id:4,s:'bdo',title:'사무용품 구매 품의',who:'5/10'},
+    {id:5,s:'bre',title:'하반기 리크리에이션 계획서',who:'5/11'},
+    {id:6,s:'bdo',title:'4월 복리후생 지급 품의',who:'5/08'},
+    {id:7,s:'bpa',title:'신규 거래처 등록 품의',who:'팀장'},
+    {id:8,s:'bac',title:'5월 비품 발주 품의',who:'담당자'},
+  ],
+  ntid:9, trf:'all',
+  milestones:[
+    {id:1,title:'하반기 기획보고 기안',pct:79,color:'#22c55e'},
+    {id:2,title:'Q2 보고서 작성',pct:45,color:'#eab308'},
+    {id:3,title:'사내행사 기획 TF',pct:38,color:'#ef4444'},
+    {id:4,title:'연말 인사지원 준비',pct:19,color:'#3b82f6'},
+  ],
+  nmid:5,
+  alerts:[
+    {id:1,color:'#ef4444',text:'본부장님 결재 반려',time:'방금 전',tag:'긴급',read:false},
+    {id:2,color:'#fbbf24',text:'임원실 대관 신청 감지',time:'22분 전',tag:null,read:false},
+    {id:3,color:'#3b82f6',text:'법인카드 사용 알림',time:'1시간 전',tag:null,read:true},
+    {id:4,color:'#22c55e',text:'출장 신청 승인',time:'3시간 전',tag:null,read:true},
+    {id:5,color:'#a855f7',text:'회의실 자동 배정 완료',time:'4시간 전',tag:null,read:true},
+  ],
+  exts:[
+    {id:1,type:'전화',tc:'#4ade80',tb:'#14532d33',title:'한국전력 시설 점검 일정',time:'오전 10:30',status:'조치필요',sc:'bre'},
+    {id:2,type:'방문',tc:'#60a5fa',tb:'#1e3a5f33',title:'납품업체 견적서 요청',time:'오후 2:00',status:'완료됨',sc:'bdo'},
+    {id:3,type:'화상',tc:'#c084fc',tb:'#4a1d9633',title:'본사 연간 예산 협의',time:'오후 4:00',status:'예정',sc:'bpa'},
+  ],
+  nextEid:4,
+  rates:[
+    {pair:'USD/KRW',val:1378.50,ch:-2.10,pct:-0.15},
+    {pair:'JPY/KRW',val:8.92,ch:0.03,pct:0.31},
+    {pair:'EUR/KRW',val:1492.30,ch:-4.90,pct:-0.33},
+    {pair:'CNY/KRW',val:190.45,ch:-0.80,pct:-0.42},
+  ],
+  calY:2026, calM:4, selDate:null,
+  events:{
+    '2026-5-13':[{text:'Q2 보고서 마감',color:'#ef4444'},{text:'팀 점심 회식',color:'#22c55e'}],
+    '2026-5-14':[{text:'회의 자료 준비',color:'#fbbf24'}],
+    '2026-5-15':[{text:'임원회의 (A회의실)',color:'#3b82f6'},{text:'외부 업체 미팅',color:'#a855f7'}],
+    '2026-5-20':[{text:'부서별 예산 협의',color:'#fbbf24'}],
+    '2026-5-27':[{text:'연차',color:'#22c55e'}],
+    '2026-5-28':[{text:'연차',color:'#22c55e'}],
+    '2026-6-3':[{text:'상반기 성과 보고',color:'#ef4444'}],
+    '2026-6-10':[{text:'법인카드 정산 마감',color:'#fbbf24'}],
+    '2026-6-15':[{text:'임원회의',color:'#3b82f6'}],
+    '2026-6-25':[{text:'하반기 사업 킥오프',color:'#a855f7'}],
+  },
+  timers:[
+    {id:1,name:'Q2 보고서 작성',secs:5420,running:false,iv:null},
+    {id:2,name:'임원회의 자료 준비',secs:1800,running:false,iv:null},
+  ],
+  ntmid:3,
+  moodHist:[
+    {emoji:'😊',label:'좋음',color:'#4ade80'},
+    {emoji:'😐',label:'보통',color:'#94a3b8'},
+    {emoji:'🔥',label:'최고',color:'#f97316'},
+    {emoji:'😔',label:'우울',color:'#60a5fa'},
+    {emoji:'😊',label:'좋음',color:'#4ade80'},
+    {emoji:'🔥',label:'최고',color:'#f97316'},
+    {emoji:'😐',label:'보통',color:'#94a3b8'},
+  ],
+  pomo:{total:25*60,brk:5*60,secs:25*60,run:false,isBrk:false,done:0,iv:null},
+  apData:[
+    {steps:[{n:'기안자',s:'done'},{n:'팀장',s:'done'},{n:'부장',s:'cur'},{n:'본부장',s:'wait'},{n:'재무',s:'wait'}]},
+    {steps:[{n:'기안자',s:'done'},{n:'팀장',s:'cur'},{n:'임원',s:'wait'},{n:'대표이사',s:'wait'}]},
+    {steps:[{n:'기안자',s:'done'},{n:'팀장',s:'done'},{n:'부장',s:'rej'}]},
+    {steps:[{n:'기안자',s:'done'},{n:'팀장',s:'done'},{n:'부장',s:'done'},{n:'재무팀',s:'done'}]},
+  ],
+};
+
+const G=id=>document.getElementById(id);
+const tLabel=s=>({bac:'기안중',bpa:'검토중',bdo:'완결',bre:'반려'}[s]||s);
+const tagC=p=>({d1:'td1',d2:'td2',d5:'td5'}[p]||'td5');
+const tagL=p=>({d1:'D-1',d2:'D-2',d5:'D-5'}[p]||p);
+const MS_CLR=['#22c55e','#eab308','#ef4444','#3b82f6','#a855f7','#06b6d4','#f97316'];
+
+/* ── MODAL ── */
+function openModal(id){
+  document.querySelectorAll('.modal-bg').forEach(m=>m.classList.remove('open'));
+  G(id).classList.add('open');
+  if(id==='m-todo'){S.mtf='all';renderMTodo();}
+  if(id==='m-tracker'){S.trf='all';renderMTracker();}
+  if(id==='m-ms')renderMMs();
+  if(id==='m-alert')renderMAlert();
+  if(id==='m-ext')renderMExt();
+}
+function closeModal(id){G(id).classList.remove('open');}
+
+/* ── KPI ── */
+function updateKPI(){
+  const ac=S.todos.filter(t=>!t.done).length, dn=S.todos.filter(t=>t.done).length;
+  const ur=S.todos.filter(t=>!t.done&&t.pri==='d1').length;
+  const wl=S.trackers.filter(t=>t.s==='bpa').length;
+  const unr=S.alerts.filter(a=>!a.read).length;
+  G('kpi-a').textContent=ac; G('kpi-d').textContent=dn;
+  G('kpi-u').textContent=ur; G('kpi-w').textContent=wl; G('kpi-al').textContent=unr;
+}
+
+/* ── TODO ── */
+function cbHtml(done,id,fn){return `<div style="width:14px;height:14px;border-radius:3px;border:1.5px solid ${done?'#2563eb':'#334155'};background:${done?'#2563eb':'transparent'};display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:8px;color:#fff" onclick="${fn}(${id})">${done?'✓':''}</div>`;}
+function todoHtml(t,fn,del){return `<div class="row"><div style="flex:1">${cbHtml(t.done,t.id,fn)}</div><div style="flex:1;display:flex;align-items:center;gap:7px;min-width:0">${cbHtml(t.done,t.id,fn)}<div style="flex:1;min-width:0"><div style="color:${t.done?'#334155':'#e2e8f0'};font-size:11px;text-decoration:${t.done?'line-through':'none'};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.text}</div><div style="margin-top:2px"><span class="tag ${t.done?'tdone':tagC(t.pri)}">${t.done?'완료':tagL(t.pri)}</span></div></div></div><span class="xb" onclick="${del}(${t.id})">✕</span></div>`;}
+
+function renderTodo(){
+  let items=S.todos;
+  if(S.tf==='active')items=items.filter(t=>!t.done);
+  if(S.tf==='done')items=items.filter(t=>t.done);
+  G('todo-cnt').textContent=S.todos.filter(t=>!t.done)+'/'+S.todos.length;
+  G('todo-list').innerHTML=items.map(t=>`<div class="row">
+    ${cbHtml(t.done,t.id,'toggleTodo')}
+    <div style="flex:1;min-width:0">
+      <div style="color:${t.done?'#334155':'#e2e8f0'};font-size:11px;text-decoration:${t.done?'line-through':'none'}">${t.text}</div>
+      <div style="margin-top:2px"><span class="tag ${t.done?'tdone':tagC(t.pri)}">${t.done?'완료':tagL(t.pri)}</span></div>
+    </div>
+    <span class="xb" onclick="deleteTodo(${t.id})">✕</span></div>`).join('');
+  updateKPI();
+}
+function renderMTodo(){
+  let items=S.todos;
+  if(S.mtf==='active')items=items.filter(t=>!t.done);
+  if(S.mtf==='done')items=items.filter(t=>t.done);
+  G('m-todo-list').innerHTML=items.map(t=>`<div class="fl-item">
+    ${cbHtml(t.done,t.id,'toggleTodoM')}
+    <span style="flex:1;color:${t.done?'#334155':'#e2e8f0'};font-size:11px;text-decoration:${t.done?'line-through':'none'}">${t.text}</span>
+    <span class="tag ${t.done?'tdone':tagC(t.pri)}">${t.done?'완료':tagL(t.pri)}</span>
+    <span class="xb" onclick="deleteTodoM(${t.id})">✕</span></div>`).join('')||'<div style="color:#334155;font-size:11px;padding:10px;text-align:center">항목이 없습니다.</div>';
+  ['mf-all','mf-ac','mf-dn'].forEach(id=>G(id).classList.remove('on'));
+  G({all:'mf-all',active:'mf-ac',done:'mf-dn'}[S.mtf]).classList.add('on');
+}
+function toggleTodo(id){const t=S.todos.find(x=>x.id===id);if(t){t.done=!t.done;renderTodo();}}
+function toggleTodoM(id){toggleTodo(id);renderMTodo();}
+function deleteTodo(id){S.todos=S.todos.filter(t=>t.id!==id);renderTodo();}
+function deleteTodoM(id){deleteTodo(id);renderMTodo();}
+function addTodo(){const v=G('todo-inp').value.trim();if(!v)return;S.todos.unshift({id:S.nid++,text:v,done:false,pri:G('todo-pri').value});G('todo-inp').value='';renderTodo();}
+function addTodoM(){const v=G('m-todo-inp').value.trim();if(!v)return;S.todos.unshift({id:S.nid++,text:v,done:false,pri:G('m-todo-pri').value});G('m-todo-inp').value='';renderTodo();renderMTodo();}
+function filterTodo(f){S.tf=f;['f-all','f-ac','f-dn'].forEach(id=>G(id).classList.remove('on'));G({all:'f-all',active:'f-ac',done:'f-dn'}[f]).classList.add('on');renderTodo();}
+function setMTF(f){S.mtf=f;renderMTodo();}
+
+/* ── TRACKER ── */
+function renderTracker(){
+  G('tr-d').textContent=S.trackers.filter(t=>t.s==='bac').length;
+  G('tr-w').textContent=S.trackers.filter(t=>t.s==='bpa').length;
+  G('tr-r').textContent=S.trackers.filter(t=>t.s==='bre').length;
+  G('tracker-list').innerHTML=S.trackers.slice(0,4).map(t=>`<div class="row"><span class="tbadge ${t.s}">${tLabel(t.s)}</span><span style="flex:1;color:#e2e8f0;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.title}</span><span style="color:#475569;font-size:10px;flex-shrink:0">${t.who}</span></div>`).join('');
+  updateKPI();
+}
+function renderMTracker(){
+  let items=S.trackers;if(S.trf!=='all')items=items.filter(t=>t.s===S.trf);
+  G('m-tracker-list').innerHTML=items.map(t=>`<div class="fl-item"><span class="tbadge ${t.s}">${tLabel(t.s)}</span><span style="flex:1;color:#e2e8f0;font-size:11px">${t.title}</span><span style="color:#475569;font-size:10px;margin-right:6px">${t.who}</span><span class="xb" onclick="deleteTrackerM(${t.id})">✕</span></div>`).join('')||'<div style="color:#334155;font-size:11px;padding:10px;text-align:center">항목이 없습니다.</div>';
+  ['tf-all','tf-bac','tf-bpa','tf-bdo','tf-bre'].forEach(id=>G(id).classList.remove('on'));
+  const m={all:'tf-all',bac:'tf-bac',bpa:'tf-bpa',bdo:'tf-bdo',bre:'tf-bre'};if(G(m[S.trf]))G(m[S.trf]).classList.add('on');
+}
+function setTRF(f){S.trf=f;renderMTracker();}
+function deleteTrackerM(id){S.trackers=S.trackers.filter(t=>t.id!==id);renderTracker();renderMTracker();}
+function addTracker(){const v=G('tr-inp').value.trim();if(!v)return;S.trackers.unshift({id:S.ntid++,s:G('tr-st').value,title:v,who:G('tr-who').value.trim()||'담당자'});G('tr-inp').value='';G('tr-who').value='';renderTracker();renderMTracker();}
+
+/* ── MILESTONE ── */
+function renderMs(){G('ms-list').innerHTML=S.milestones.slice(0,4).map(m=>`<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;color:#cbd5e1;font-size:11px;margin-bottom:3px"><span>${m.title}</span><span style="color:${m.color}">${m.pct}%</span></div><div class="pb"><div class="pf" style="width:${m.pct}%;background:${m.color}"></div></div></div>`).join('');}
+function renderMMs(){G('m-ms-list').innerHTML=S.milestones.map(m=>`<div class="fl-item" style="flex-direction:column;align-items:stretch;gap:5px"><div style="display:flex;align-items:center;gap:8px"><span style="flex:1;color:#e2e8f0;font-size:11px">${m.title}</span><span style="color:${m.color};font-size:11px;min-width:32px;text-align:right" id="mpl-${m.id}">${m.pct}%</span><input type="range" min="0" max="100" value="${m.pct}" class="range-inp" style="width:90px" oninput="updateMs(${m.id},this.value)"/><span class="xb" onclick="deleteMs(${m.id})">✕</span></div><div class="pb"><div class="pf" id="mpb-${m.id}" style="width:${m.pct}%;background:${m.color}"></div></div></div>`).join('');}
+function updateMs(id,val){const m=S.milestones.find(x=>x.id===id);if(m){m.pct=+val;const b=G('mpb-'+id),l=G('mpl-'+id);if(b)b.style.width=val+'%';if(l)l.textContent=val+'%';renderMs();}}
+function deleteMs(id){S.milestones=S.milestones.filter(m=>m.id!==id);renderMs();renderMMs();}
+function addMs(){const v=G('ms-inp').value.trim();if(!v)return;const p=Math.max(0,Math.min(100,parseInt(G('ms-pct').value)||0));S.milestones.push({id:S.nmid++,title:v,pct:p,color:MS_CLR[S.milestones.length%MS_CLR.length]});G('ms-inp').value='';G('ms-pct').value='';renderMs();renderMMs();}
+
+/* ── ALERTS ── */
+function renderAlert(){G('alert-list').innerHTML=S.alerts.slice(0,4).map(a=>`<div class="row" style="opacity:${a.read?.5:1}"><div style="width:7px;height:7px;border-radius:50%;background:${a.color};flex-shrink:0"></div><div style="flex:1"><div style="color:#e2e8f0;font-size:11px">${a.text}</div><div style="color:#475569;font-size:10px">${a.time}</div></div>${a.tag?`<span class="tag td1">${a.tag}</span>`:''}<span class="xb" onclick="dismissAlert(${a.id})">✕</span></div>`).join('');updateKPI();}
+function renderMAlert(){G('m-alert-list').innerHTML=S.alerts.map(a=>`<div class="fl-item" style="opacity:${a.read?.5:1}"><div style="width:8px;height:8px;border-radius:50%;background:${a.color};flex-shrink:0"></div><div style="flex:1"><div style="color:#e2e8f0;font-size:11px">${a.text}</div><div style="color:#475569;font-size:10px">${a.time}</div></div>${a.tag?`<span class="tag td1">${a.tag}</span>`:''}<span class="xb" onclick="dismissAlertM(${a.id})">✕</span></div>`).join('')||'<div style="color:#334155;font-size:11px;padding:10px;text-align:center">알림이 없습니다.</div>';}
+function dismissAlert(id){S.alerts=S.alerts.filter(a=>a.id!==id);renderAlert();}
+function dismissAlertM(id){dismissAlert(id);renderMAlert();}
+function clearAlerts(){S.alerts.forEach(a=>a.read=true);renderAlert();}
+
+/* ── EXT ── */
+function renderExt(){G('ext-list').innerHTML=S.exts.slice(0,2).map(e=>`<div class="row"><div style="width:27px;height:27px;border-radius:5px;background:${e.tb};color:${e.tc};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0">${e.type}</div><div style="flex:1;min-width:0"><div style="color:#e2e8f0;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.title}</div><div style="color:#475569;font-size:10px">${e.time}</div></div><span class="tbadge ${e.sc}" style="font-size:9px">${e.status}</span></div>`).join('');}
+function renderMExt(){G('m-ext-list').innerHTML=S.exts.map(e=>`<div class="fl-item"><div style="width:30px;height:30px;border-radius:5px;background:${e.tb};color:${e.tc};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">${e.type}</div><div style="flex:1"><div style="color:#e2e8f0;font-size:11px">${e.title}</div><div style="color:#475569;font-size:10px">${e.time}</div></div><span class="tbadge ${e.sc}">${e.status}</span><span class="xb" onclick="deleteExtM(${e.id})">✕</span></div>`).join('')||'<div style="color:#334155;font-size:11px;padding:10px;text-align:center">항목이 없습니다.</div>';}
+function deleteExtM(id){S.exts=S.exts.filter(e=>e.id!==id);renderExt();renderMExt();}
+function addExt(){const v=G('ext-inp').value.trim();if(!v)return;const type=G('ext-type').value;const meta={전화:{tc:'#4ade80',tb:'#14532d33'},방문:{tc:'#60a5fa',tb:'#1e3a5f33'},화상:{tc:'#c084fc',tb:'#4a1d9633'}};S.exts.push({id:S.nextEid++,type,...meta[type],title:v,time:G('ext-time').value.trim()||'미정',status:'예정',sc:'bpa'});G('ext-inp').value='';G('ext-time').value='';renderExt();renderMExt();}
+
+/* ── RATES ── */
+function renderRates(){G('rate-grid').innerHTML=S.rates.map(r=>`<div class="sb"><div style="font-size:18px;font-weight:800;color:#f1f5f9">${r.val.toFixed(2)}</div><div style="font-size:10px;color:#475569;margin-top:2px">${r.pair}</div><div style="font-size:10px;margin-top:3px;color:${r.ch>0?'#4ade80':'#f87171'}">${r.ch>0?'▲':'▼'} ${Math.abs(r.ch).toFixed(2)} (${Math.abs(r.pct).toFixed(2)}%)</div></div>`).join('');}
+function refreshRates(){const ic=G('rate-ic');ic.classList.add('rspin');G('rate-btn').disabled=true;setTimeout(()=>{S.rates=S.rates.map(r=>{const d=(Math.random()-.5)*7;return{...r,val:+(r.val+d).toFixed(2),ch:+d.toFixed(2),pct:+(d/r.val*100).toFixed(2)};});renderRates();ic.classList.remove('rspin');G('rate-btn').disabled=false;},1100);}
+
+/* ── CALENDAR ── */
+function renderCal(){
+  const y=S.calY,m=S.calM;G('cal-title').textContent=y+'년 '+(m+1)+'월';
+  const first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate(),now=new Date();
+  const isNow=now.getFullYear()===y&&now.getMonth()===m,todayD=now.getDate();
+  let html='<div class="cal-grid-wrap">';
+  ['일','월','화','수','목','금','토'].forEach((n,i)=>html+=`<div class="cdn" style="${i===0?'color:#ef444466':i===6?'color:#3b82f666':''}">${n}</div>`);
+  for(let i=0;i<first;i++)html+='<div class="cd empty"></div>';
+  for(let d=1;d<=days;d++){
+    const key=y+'-'+(m+1)+'-'+d,evs=S.events[key]||[];
+    const isToday=isNow&&d===todayD,isPast=new Date(y,m,d)<new Date(now.getFullYear(),now.getMonth(),now.getDate()),isSel=S.selDate===key;
+    let cls='cd';if(isToday)cls+=' today';else if(isSel)cls+=' sel';else if(evs.length)cls+=' has-ev';else if(isPast)cls+=' past';
+    html+=`<div class="${cls}" onclick="selectDate('${key}',${d})">${d}${evs.length&&!isToday?`<span class="ev-dot" style="background:${evs[0].color}"></span>`:''}</div>`;
+  }
+  html+='</div>';G('cal-grid').innerHTML=html;renderUpcoming();
+}
+function selectDate(key,d){
+  S.selDate=S.selDate===key?null:key;renderCal();
+  const box=G('cal-ev-box');
+  if(S.selDate){
+    const evs=S.events[key]||[];
+    G('ev-date-lbl').textContent=(S.calM+1)+'월 '+d+'일 일정 ('+evs.length+'건)';
+    G('ev-items').innerHTML=evs.length?evs.map(e=>`<div class="ev-item"><span style="width:7px;height:7px;border-radius:50%;background:${e.color};flex-shrink:0;display:inline-block"></span>${e.text}</div>`).join(''):'<div class="ev-item" style="color:#334155">등록된 일정이 없습니다.</div>';
+    box.style.display='block';
+  } else box.style.display='none';
+}
+function renderUpcoming(){
+  const y=S.calY,m=S.calM;
+  const items=Object.entries(S.events).filter(([k])=>{const p=k.split('-');return+p[0]===y&&+p[1]===(m+1);}).sort((a,b)=>+a[0].split('-')[2]-+b[0].split('-')[2]).slice(0,4);
+  G('upcoming').innerHTML=items.map(([k,evs])=>{const d=k.split('-')[2];return evs.slice(0,1).map(e=>`<div class="row" style="padding:4px 8px"><span style="color:${e.color}">●</span><span style="flex:1;color:#e2e8f0;font-size:11px">${e.text}</span><span style="font-size:10px;color:${e.color}">${(m+1)}/${d}</span></div>`).join('');}).join('')||'<div style="color:#334155;font-size:11px;padding:4px 8px">이달 일정이 없습니다.</div>';
+}
+function changeMonth(dir){S.calM+=dir;if(S.calM>11){S.calM=0;S.calY++;}if(S.calM<0){S.calM=11;S.calY--;}S.selDate=null;G('cal-ev-box').style.display='none';renderCal();}
+
+/* ── AI ── */
+const AI_KB={
+  '브리핑|오늘|업무':()=>`오늘 주요 업무:\n① Q2 보고서 결재 상신 (D-1 · 최우선)\n② 임원회의실 예약 및 자료 배포 (D-2)\n③ 사무용품 발주 (D-5)\n\n미완료 항목 ${S.todos.filter(t=>!t.done).length}건 남아있습니다.`,
+  '결재|미결':()=>`현재 결재 현황:\n• 기안중: ${S.trackers.filter(t=>t.s==='bac').length}건\n• 검토중: ${S.trackers.filter(t=>t.s==='bpa').length}건\n• 반려: ${S.trackers.filter(t=>t.s==='bre').length}건\n반려 건은 수정 후 재상신이 필요합니다.`,
+  '일정|주':'이번 주 주요 일정:\n• 5/13(오늘): Q2 보고서 마감\n• 5/14: 회의 자료 준비\n• 5/15: 임원회의 (A회의실)\n오늘 중 회의 자료 준비 완료를 권장합니다.',
+  '연차|휴가':'연차 현황:\n• 총 25일 / 사용 14일 (56%) / 잔여 11일\n예정 연차: 5/27~28 (2일)\n연말 소진 권고 기준: 9월 이전 추가 사용 권장',
+  '회의실|예약':'오늘 회의실 현황:\n• 대회의실: 10~12시 사용중\n• A회의실: 9~10시, 13~15시\n• B회의실: 11~13시 외부행사\n• 화상회의실: 10시, 14~15시\n예약은 그룹웨어 또는 총무팀 문의',
+  '법인카드|카드':'법인카드 안내:\n① 50만원 초과 시 사전 결재 필요\n② 개인 용도 사용 금지\n③ 영수증 7일 이내 제출\n④ 월말 정산 전 누락 항목 확인 필수',
+  '예산':'부서 예산 현황 (5월):\n• 총 예산 ₩4.8M / 사용 ₩3.3M (68%)\n• 소모품 ₩2.1M / 교육비 ₩0.8M / 회식비 ₩0.4M\n• 잔여 ₩1.5M — 월말 정산 전 추가 집행 검토 바람',
+  '포모도로|집중':'포모도로 타이머 사용법:\n① ▶ 시작 → 25분 집중\n② 완료 시 자동으로 5분 휴식 전환\n③ 4회 완료 시 장휴식 권장\n집중 타이머를 활성화하면 업무 효율이 높아져요!',
+};
+function getAI(q){
+  const l=q.toLowerCase();
+  for(const[ks,ans]of Object.entries(AI_KB)){if(ks.split('|').some(k=>l.includes(k)))return typeof ans==='function'?ans():ans;}
+  return ['해당 내용은 그룹웨어 또는 담당 부서에 문의해주세요. 추가 도움이 필요하시면 말씀해주세요.','현재 미완료 업무가 '+S.todos.filter(t=>!t.done).length+'건입니다. 우선순위를 확인해보세요.','알겠습니다. 위 빠른 질문 버튼을 활용하면 주요 정보를 빠르게 조회할 수 있어요.'][Math.floor(Math.random()*3)];
+}
+function appendMsg(role,text){
+  const a=G('chat-area'),div=document.createElement('div');div.className='msg m'+role;
+  if(role==='a')div.innerHTML='<div class="mal">AI 비서</div>'+text.replace(/\n/g,'<br>');else div.textContent=text;
+  a.appendChild(div);a.scrollTop=a.scrollHeight;
+}
+function sendAI(){
+  const inp=G('ai-inp'),q=inp.value.trim();if(!q)return;inp.value='';appendMsg('u',q);
+  const ld=document.createElement('div');ld.className='ml2';ld.innerHTML='<span class="sp2"></span> 분석 중...';
+  G('chat-area').appendChild(ld);G('chat-area').scrollTop=G('chat-area').scrollHeight;
+  setTimeout(()=>{ld.remove();appendMsg('a',getAI(q));},650+Math.random()*450);
+}
+function quickAsk(q){G('ai-inp').value=q;sendAI();}
+
+/* ── 포모도로 ── */
+function pFmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
+function updatePomoDots(){
+  let h='';for(let i=0;i<4;i++)h+=`<span class="pdot${i<S.pomo.done?' done':''}"></span>`;
+  G('pomo-dots').innerHTML=h;
+  G('pomo-stat').textContent=`오늘 완료: ${S.pomo.done} 포모도로 (${Math.floor(S.pomo.done*25/60)}시간 ${(S.pomo.done*25)%60}분)`;
+}
+function updatePomoDisp(){
+  const total=S.pomo.isBrk?S.pomo.brk:S.pomo.total;
+  G('pomo-time').textContent=pFmt(S.pomo.secs);
+  G('pomo-lbl').textContent=S.pomo.isBrk?'☕ 휴식 시간':'🎯 집중 시간';
+  G('pomo-bar').style.width=(S.pomo.secs/total*100)+'%';
+  G('pomo-bar').style.background=S.pomo.isBrk?'#22c55e':'#ef4444';
+}
+function pomoToggle(){
+  if(S.pomo.run){clearInterval(S.pomo.iv);S.pomo.run=false;G('pomo-btn').textContent='▶ 시작';}
+  else{S.pomo.run=true;G('pomo-btn').textContent='⏸ 일시정지';
+    S.pomo.iv=setInterval(()=>{S.pomo.secs--;updatePomoDisp();
+      if(S.pomo.secs<=0){clearInterval(S.pomo.iv);S.pomo.run=false;
+        if(!S.pomo.isBrk){S.pomo.done++;updatePomoDots();S.pomo.isBrk=true;S.pomo.secs=S.pomo.brk;}
+        else{S.pomo.isBrk=false;S.pomo.secs=S.pomo.total;}
+        G('pomo-btn').textContent='▶ 시작';updatePomoDisp();}
+    },1000);}
+}
+function pomoReset(){clearInterval(S.pomo.iv);S.pomo.run=false;S.pomo.isBrk=false;S.pomo.secs=S.pomo.total;G('pomo-btn').textContent='▶ 시작';updatePomoDisp();}
+function pomoSkip(){clearInterval(S.pomo.iv);S.pomo.run=false;if(!S.pomo.isBrk){S.pomo.done++;updatePomoDots();S.pomo.isBrk=true;S.pomo.secs=S.pomo.brk;}else{S.pomo.isBrk=false;S.pomo.secs=S.pomo.total;}G('pomo-btn').textContent='▶ 시작';updatePomoDisp();}
+
+/* ── 업무 타이머 ── */
+function fmtT(s){const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;return(h?h+'h ':'')+String(m).padStart(2,'0')+'m '+String(sec).padStart(2,'0')+'s';}
+function updateTotal(){const t=S.timers.reduce((a,x)=>a+x.secs,0);G('total-time').textContent='오늘 총 '+Math.floor(t/3600)+'h '+Math.floor((t%3600)/60)+'m';}
+function renderTimers(){
+  G('timer-list').innerHTML=S.timers.map(t=>`<div class="timer-item">
+    <div style="flex:1;color:#e2e8f0;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.name}</div>
+    <div class="tdisplay ${t.running?'trun':'tpause'}" id="td-${t.id}">${fmtT(t.secs)}</div>
+    <button class="tbtn ${t.running?'tbtn-y':'tbtn-g'}" onclick="toggleTimer(${t.id})">${t.running?'⏸':'▶'}</button>
+    <button class="tbtn tbtn-r" onclick="deleteTimer(${t.id})">✕</button>
+  </div>`).join('')||'<div style="color:#334155;font-size:11px;padding:6px 0;text-align:center">추적 중인 업무가 없습니다.</div>';
+}
+function toggleTimer(id){
+  const t=S.timers.find(x=>x.id===id);if(!t)return;
+  if(t.running){clearInterval(t.iv);t.running=false;}
+  else{t.running=true;t.iv=setInterval(()=>{t.secs++;const el=G('td-'+id);if(el)el.textContent=fmtT(t.secs);updateTotal();},1000);}
+  renderTimers();
+}
+function deleteTimer(id){const t=S.timers.find(x=>x.id===id);if(t&&t.iv)clearInterval(t.iv);S.timers=S.timers.filter(x=>x.id!==id);renderTimers();updateTotal();}
+function addTimer(){const v=G('timer-inp').value.trim();if(!v)return;S.timers.push({id:S.ntmid++,name:v,secs:0,running:false,iv:null});G('timer-inp').value='';renderTimers();}
+
+/* ── 컨디션 체크 ── */
+const MOOD_ADV=['오늘 많이 힘드시군요. 필수 업무만 남기고 휴식을 취해보세요. 💙','조금 우울한 날이군요. 짧은 산책이나 동료와 대화를 나눠보세요. 🌱','보통의 하루네요. 루틴대로 차근차근 진행하면 됩니다. 👍','컨디션 좋은 날! 어려운 업무를 오늘 처리해보세요. 😊','최고의 컨디션! 중요한 보고서나 창의적 업무에 도전하세요. 🔥'];
+const MOOD_CLR=['#60a5fa','#94a3b8','#fbbf24','#4ade80','#f97316'];
+function selectMood(idx,emoji,label){
+  document.querySelectorAll('.mood-btn').forEach((b,i)=>b.classList.toggle('sel',i===idx));
+  G('mood-advice').textContent=MOOD_ADV[idx];G('mood-saved-lbl').textContent='✓ '+label+' 기록됨';
+  S.moodHist.push({emoji,label,color:MOOD_CLR[idx]});if(S.moodHist.length>14)S.moodHist.shift();renderMoodHist();
+}
+function renderMoodHist(){G('mood-hist').innerHTML=S.moodHist.slice(-7).map(m=>`<div class="mood-dot" style="background:${m.color};border-color:${m.color}33" title="${m.label} ${m.emoji}"></div>`).join('');}
+
+/* ── 히트맵 ── */
+function renderHeatmap(){
+  const CLR=['#1e293b','#14532d33','#16a34a55','#16a34a99','#22c55e'];
+  const data=Array.from({length:91},()=>Math.random()<.3?0:Math.floor(Math.random()*5));
+  const now=new Date();const labels=[];
+  for(let w=12;w>=0;w--){const d=new Date(now);d.setDate(d.getDate()-w*7);labels.push((d.getMonth()+1)+'/'+(d.getDate()));}
+  G('hm-labels').innerHTML=labels.map((l,i)=>i%3===0?`<div class="hm-lbl">${l}</div>`:'<div class="hm-lbl"></div>').join('');
+  G('heatmap').innerHTML=data.map((v,i)=>`<div class="hm-cell" style="background:${CLR[v]}" title="${v}건" onmouseenter="G('hm-tip').textContent='${v}건 완료'" onmouseleave="G('hm-tip').textContent=''"></div>`).join('');
+}
+
+/* ── 결재 경로 ── */
+function renderApproval(){
+  const data=S.apData[parseInt(G('ap-sel').value)];
+  const cls={done:'ap-done',cur:'ap-cur',wait:'ap-wait',rej:'ap-rej'};
+  const icon={done:'✓',cur:'●',wait:'○',rej:'✕'};
+  let html='';
+  data.steps.forEach((step,i)=>{
+    html+=`<div class="ap-step"><div class="ap-node ${cls[step.s]}">${icon[step.s]}</div><div class="ap-name">${step.n}</div></div>`;
+    if(i<data.steps.length-1)html+=`<div class="ap-arr">→</div>`;
+  });
+  G('ap-path').innerHTML=html;
+}
+
+/* ── 문서 생성기 ── */
+const TMPLS={
+  '품의서':'[품의서]\n\n■ 품의 제목: \n■ 품의 일자: 2026. 05. 13.\n■ 품의 부서: 경영지원본부 총무팀\n■ 품의 금액: ₩          원\n\n【품의 사유】\n  아래와 같이 품의하오니 승인해 주시기 바랍니다.\n\n【내용】\n  1. \n  2. \n\n담당: ___  팀장: ___  부장: ___  본부장: ___',
+  '회의록':'[회의록]\n\n■ 회의명: \n■ 일  시: 2026. 05. 13.  시 ~ 시\n■ 장  소: \n■ 참석자: \n\n【안건】\n  1. \n  2. \n\n【결정사항】\n  1. \n  2. \n\n【후속조치】\n  담당: ___  /  기한: \n\n작성자: ___________',
+  '보고서':'[업무 보고서]\n\n■ 보고 일자: 2026. 05. 13.\n■ 보고 부서: 경영지원본부 총무팀\n■ 보고 제목: \n\n【개요】\n  \n\n【현황 및 분석】\n  1. \n  2. \n\n【결론 및 건의사항】\n  \n\n담당: ___  /  팀장: ___',
+  '출장신청':'[출장 신청서]\n\n■ 신청자: \n■ 출장지: \n■ 기  간: 2026. 05.    ~    (  박  일)\n■ 목  적: \n\n【상세 일정】\n  \n\n【예상 경비】\n  교통비: ₩     / 숙박비: ₩     / 기타: ₩\n\n담당: ___  /  팀장: ___  /  부장: ___',
+  '업무협조':'[업무 협조 요청]\n\n수  신: \n발  신: 경영지원본부 총무팀\n제  목: \n일  자: 2026. 05. 13.\n\n아래와 같이 업무 협조를 요청드립니다.\n\n【협조 내용】\n  1. \n  2. \n\n【요청 기한】: 2026. 05. \n\n담당자: ☎ 내선 ',
+  '연차신청':'[연차 신청서]\n\n■ 신청자: \n■ 소  속: 경영지원본부 총무팀\n■ 연차 종류: □ 연차  □ 반차(오전)  □ 반차(오후)\n■ 사용 일자: 2026. 05.    ~    (  일)\n■ 사  유: \n■ 업무 인수인계자: \n\n담당: ___  /  팀장: ___',
+};
+function loadTemplate(name){
+  const p=G('doc-prev');p.textContent=TMPLS[name];p.classList.add('show');
+  G('doc-action-btns').style.display='flex';
+}
+function copyDoc(){
+  navigator.clipboard.writeText(G('doc-prev').textContent).then(()=>{const b=G('doc-copy-btn');b.textContent='✓ 복사됨!';setTimeout(()=>b.textContent='📋 복사',1500);}).catch(()=>{});
+}
+function clearDoc(){G('doc-prev').textContent='';G('doc-prev').classList.remove('show');G('doc-action-btns').style.display='none';}
+
+/* ── 메모 ── */
+function saveMemo(){const s=G('memo-saved');s.classList.add('show');setTimeout(()=>s.classList.remove('show'),2000);}
+function clearMemo(){G('memo-area').value='';}
+
+/* ── 도넛 ── */
+function initDonut(){
+  const r=36,circ=2*Math.PI*r;
+  const segs=[{pct:.4375,color:'#3b82f6',el:'dc1'},{pct:.1667,color:'#22c55e',el:'dc2'},{pct:.0833,color:'#fbbf24',el:'dc3'}];
+  setTimeout(()=>{
+    let offset=0;
+    segs.forEach(seg=>{
+      const len=circ*seg.pct,gap=circ-len;
+      const el=G(seg.el);el.style.strokeDasharray=`${len} ${gap}`;el.style.strokeDashoffset=-offset;offset+=len;
+    });
+  },400);
+}
+
+/* ── CLOCK ── */
+function tick(){
+  const n=new Date(),h=String(n.getHours()).padStart(2,'0'),mi=String(n.getMinutes()).padStart(2,'0'),s=String(n.getSeconds()).padStart(2,'0');
+  G('clock').textContent=h+':'+mi+':'+s;
+  const days=['일','월','화','수','목','금','토'];
+  G('today-lbl').textContent='📅 '+n.getFullYear()+'.'+String(n.getMonth()+1).padStart(2,'0')+'.'+String(n.getDate()).padStart(2,'0')+' ('+days[n.getDay()]+')';
+}
+
+/* ── INIT ── */
+function init(){
+  tick();setInterval(tick,1000);
+  renderTodo();filterTodo('all');
+  renderTracker();renderMs();renderAlert();renderExt();renderRates();renderCal();
+  renderHeatmap();renderMoodHist();renderTimers();updateTotal();
+  updatePomoDisp();updatePomoDots();renderApproval();initDonut();
+}
+init();
+</script>
+</body>
+</html>
