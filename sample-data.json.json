@@ -1,0 +1,22 @@
+{
+  "departments": [
+    { "name": "기획부", "total": 12, "active": 8, "progress": "66.6%" },
+    { "name": "홍보부", "total": 8, "active": 5, "progress": "62.5%" },
+    { "name": "인사부", "total": 6, "active": 4, "progress": "66.6%" },
+    { "name": "재정부", "total": 5, "active": 3, "progress": "60.0%" }
+  ],
+  "documents": [
+    { "id": "DOC-2026-001", "title": "1분기 동아리 연합회 예산안", "dept": "재정부", "status": "대기", "date": "05-24" },
+    { "id": "DOC-2026-002", "title": "5월 정기 문화행사 기획서", "dept": "기획부", "status": "대기", "date": "05-25" },
+    { "id": "DOC-2026-003", "title": "신규 동아리 등록 신청 검토", "dept": "인사부", "status": "대기", "date": "05-25" }
+  ],
+  "notices": [
+    { "tag": "필독", "text": "중앙동아리 하반기 등록 서류 마감 안내 (06/15)", "isUrgent": true },
+    { "tag": "공지", "text": "동아리 연합회실 물품 신청 기간 안내", "isUrgent": false },
+    { "tag": "회의", "text": "이번 주 목요일 전체 대표자 회의 소집", "isUrgent": false }
+  ],
+  "meetings": [
+    { "title": "상임위원회 주간 회의", "time": "14:00 - 15:30", "room": "동연 회의실", "desc": "상반기 예산 심의 및 분과별 사업 공유" },
+    { "title": "문화분과 소위원회", "time": "16:00 - 17:00", "room": "세미나실 B", "desc": "축제 부스 배치 및 안전 관리 계획 수립" }
+  ]
+}
