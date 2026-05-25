@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>행정업무 종합 대시보드</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="tl">
+      <span class="org">제42대 동아리연합회</span>
+      <span class="tt">행정업무 종합 대시보드</span>
+      <span class="ts">v1.4.2</span>
+    </div>
+    <div class="tr2">
+      <span><span class="ticon">👤</span> 최고관리자</span>
+      <span id="clock">00:00:00</span>
+    </div>
+  </div>
+
+  <div class="main">
+    
+    <div class="lside">
+      <div class="card">
+        <div class="card-t">조직 부서 현황 <span>LIVE</span></div>
+        <div id="dept-list" class="l-list">
+          </div>
+      </div>
+
+      <div class="card">
+        <div class="card-t">연합회 리소스 현황</div>
+        <div class="donut-c">
+          <svg width="90" height="90">
+            <circle class="donut-bg" cx="45" cy="45" r="36"/>
+            <circle id="dc1" class="donut-seg" cx="45" cy="45" r="36" stroke="#3b82f6"/>
+            <circle id="dc2" class="donut-seg" cx="45" cy="45" r="36" stroke="#22c55e"/>
+            <circle id="dc3" class="donut-seg" cx="45" cy="45" r="36" stroke="#fbbf24"/>
+          </svg>
+          <div class="donut-txt">
+            <div class="dt-num">68.7%</div>
+            <div class="dt-lbl">사용중</div>
+          </div>
+        </div>
+        <div class="l-list">
+          <div class="l-item"><span class="l-n"><i class="dot" style="background:#3b82f6"></i>운영비 잔액</span><span class="l-v">43.7%</span></div>
+          <div class="l-item"><span class="l-n"><i class="dot" style="background:#22c55e"></i>공용 물품</span><span class="l-v">16.6%</span></div>
+          <div class="l-item"><span class="l-n"><i class="dot" style="background:#fbbf24"></i>대여 공간</span><span class="l-v">8.3%</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-t">시스템 상태</div>
+        <div class="stat-g">
+          <div class="st-box"><div class="st-lbl">서버 상태</div><div class="st-val green">정상</div></div>
+          <div class="st-box"><div class="st-lbl">DB 연결</div><div class="st-val green">양호</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cside">
+      <div>
+        <div class="section-t">📋 실시간 전자결재 대기 목록</div>
+        <div class="tbl-w">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:100px;">문서번호</th>
+                <th>문서제목</th>
+                <th style="width:80px;">기안부서</th>
+                <th style="width:70px;">상태</th>
+                <th style="width:70px;">기안일</th>
+                <th style="width:60px;">관리</th>
+              </tr>
+            </thead>
+            <tbody id="doc-tbody">
+              </tbody>
+          </table>
+        </div>
+
+        <div id="doc-prev" class="doc-preview-box">
+          <div id="doc-prev-t" class="dp-h"></div>
+          <div id="doc-prev-body" class="dp-b"></div>
+          <div id="doc-action-btns" class="memo-b" style="display:none;">
+            <button class="btn sec" onclick="closeDoc()">닫기</button>
+            <button class="btn primary" style="background:#f43f5e;" onclick="closeDoc()">반려</button>
+            <button class="btn primary" style="background:#22c55e;" onclick="closeDoc()">최종 승인</button>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-t">📢 주요 공지 및 행정 동향</div>
+        <div id="notice-container" class="notice-g">
+          </div>
+      </div>
+    </div>
+
+    <div class="rside">
+      <div class="card">
+        <div class="cal-w">
+          <div id="cal-yr-mo" class="cal-h">2026년 5월</div>
+          <div id="cal-grid" class="cal-grid"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-t">금일 주요 회의 및 일정</div>
+        <div id="meeting-container" class="meet-g">
+          </div>
+      </div>
+
+      <div class="card">
+        <div class="card-t">업무 메모 스크랩북</div>
+        <div class="memo-w">
+          <textarea id="memo-area" placeholder="여기에 실시간 행정 메모를 작성하세요... 실시간 브라우저 세션에 임시 저장됩니다."></textarea>
+          <div class="memo-b">
+            <span id="memo-saved" class="toast">저장되었습니다</span>
+            <button class="btn sec" onclick="clearMemo()">비우기</button>
+            <button class="btn primary" onclick="saveMemo()">메모 저장</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>
